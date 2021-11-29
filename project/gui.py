@@ -19,11 +19,11 @@ def draw_figure(ax, canvas, results):
     ax.grid()
 
     if results['message'] == 'ok':
-        ax.plot(results['x_s'], results['E_f_s'], label='Fermi Energy')
-        ax.plot(results['x_s'], results['E_v_s'], label='Valence Band')
-        ax.plot(results['x_s'], results['E_c_s'], label='Conduction Band')
-        ax.plot(results['x_s'], results['E_d_s'], label='Donor Energy')
-        ax.plot(results['x_s'], results['E_as_s'], label='Acceptor Energy')
+        ax.plot(results['x_s'], results['E_c_s'], c='red', label='Conduction Band')
+        ax.plot(results['x_s'], results['E_f_s'], c='darkorange', label='Fermi Energy')
+        ax.plot(results['x_s'], results['E_as_s'], c='green', label='Acceptor Energy')
+        ax.plot(results['x_s'], results['E_d_s'], c='blue', label='Donor Energy')
+        ax.plot(results['x_s'], results['E_v_s'], c='purple', label='Valence Band')
         ax.axhline(results['phi'], c='k', linestyle='dashed')
         ax.axvline(results['W'], c='k', linestyle='dashed')
         ax.legend(fontsize=10, loc='right')
