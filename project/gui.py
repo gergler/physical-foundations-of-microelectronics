@@ -6,10 +6,10 @@ import calculations
 
 matplotlib.use("TkAgg")
 
-height = 850
-width = 1500
+height = 900
+width = 1400
 
-coef_phys_parameters = {'N_d0': 1e12, 'N_as': 1e13, 'E_out': 1e4}
+coef_phys_parameters = {'N_d0': 1e16, 'N_as': 1e17, 'E_out': 1e4}
 
 
 def draw_figure(ax, canvas, results):
@@ -21,7 +21,7 @@ def draw_figure(ax, canvas, results):
     if results['message'] == 'ok':
         ax.plot(results['x_s'], results['E_c_s'], c='red', label='Conduction Band')
         ax.plot(results['x_s'], results['E_f_s'], c='darkorange', label='Fermi Energy')
-        ax.plot(results['x_s'], results['E_as_s'], c='green', label='Acceptor Energy')
+        ax.plot(results['x_s'][0:round(len(results['x_s'])/2)], results['E_as_s'][0:round(len(results['E_as_s'])/2)], c='green', label='Acceptor Energy')
         ax.plot(results['x_s'], results['E_d_s'], c='blue', label='Donor Energy')
         ax.plot(results['x_s'], results['E_v_s'], c='purple', label='Valence Band')
         ax.axhline(results['phi'], c='k', linestyle='dashed')
@@ -51,9 +51,9 @@ def get_calculated_values():
         "m_h": float(m_h.get()),  # Effective hole mass [m_0]
         "m_e": float(m_e.get()),  # Effective electron mass [m_0]
         "E_d": float(E_d.get()),  # Donors level [eV]
-        "N_d0": float(N_d0.get()) * coef_phys_parameters['N_d0'],  # Concentration of donors 10^27 [cm^(-3)]
+        "N_d0": float(N_d0.get()) * coef_phys_parameters['N_d0'],  # Concentration of donors [cm^(-3)]
         "E_as": float(E_as.get()),  # Surface acceptors level [eV]
-        "N_as": float(N_as.get()) * coef_phys_parameters['N_as'],  # Concentration of surface acceptors 10^27 [cm^(-3)]
+        "N_as": float(N_as.get()) * coef_phys_parameters['N_as'],  # Concentration of surface acceptors [cm^(-3)]
         "T": float(T.get()),  # Temperature [K]
         "E_out": float(E_out.get()) * coef_phys_parameters['E_out'],  # External electric field
         "material": mat  # Material
@@ -73,7 +73,7 @@ def GaAs_calculated():
         "E_as": 1.424 / 2,  # Surface acceptors level [eV]
         "N_as": 10 * coef_phys_parameters['N_as'],  # Concentration of surface acceptors 10^27 [cm^(-3)]
         "T": 300,  # Temperature [K]
-        "E_out": 1,  # External electric field
+        "E_out": 1 * coef_phys_parameters['E_out'],  # External electric field
         "material": 'Si'  # Material
     }
 
@@ -104,7 +104,7 @@ def Ge_calculated():
         "E_as": 0.661 / 2,  # Surface acceptors level [eV]
         "N_as": 10 * coef_phys_parameters['N_as'],  # Concentration of surface acceptors 10^27 [cm^(-3)]
         "T": 300,  # Temperature [K]
-        "E_out": 1,  # External electric field
+        "E_out": 1 * coef_phys_parameters['E_out'],  # External electric field
         "material": 'Si'  # Material
     }
 
@@ -135,7 +135,7 @@ def Si_calculated():
         "E_as": 1.12 / 2,  # Surface acceptors level [eV]
         "N_as": 10 * coef_phys_parameters['N_as'],  # Concentration of surface acceptors 10^27 [cm^(-3)]
         "T": 300,  # Temperature [K]
-        "E_out": 1,  # External electric field
+        "E_out": 1 * coef_phys_parameters['E_out'],  # External electric field
         "material": 'Si'  # Material
     }
 
@@ -157,11 +157,11 @@ def Si_calculated():
 
 def output_info(results):
     if results['message'] != 'ok':
-        tk.Label(window, text=results['message'], fg='orange').grid(row=16, column=5, columnspan=15, rowspan=15,
+        tk.Label(window, text=results['message'], fg='darkorange', bg='white').grid(row=16, column=5, columnspan=15, rowspan=15,
                                                                     stick='we')
     else:
         tk.Label(window,
-                 text=f"fermi level: {results['E_f_s'][0]:.4f} [eV]\nbending of zone PHI: {results['phi']:.4f} [eV]\nspace charge region W: {results['W']:.4f} [cm]",
+                 text=f"fermi level: {results['E_f_s'][0]:.6f} [eV]\nbending of zone PHI: {results['phi']:.6f} [eV]\nspace charge region W: {results['W']:.8f} [cm]",
                  fg='black', bg='white').grid(row=16, column=5, columnspan=15, rowspan=15, stick='we')
 
 
@@ -210,8 +210,8 @@ window.resizable(True, True)
 
 text = [['forbidden zone E_g: ', '[eV]'], ['dielectric constant ε: ', ' '], ['effective hole masses m_h: ', 'm_0'],
         ['effective electron masses m_e: ', 'm_0'], ['donor level position E_d: ', '[eV]'],
-        ['donor concentration N_d0: ', '10^12[cm^(-3)]'],
-        ['energy level position E_as: ', '[eV]'], ['surface acceptor density N_as: ', '10^13[cm^(-3)]'],
+        ['donor concentration N_d0: ', '10^16[cm^(-3)]'],
+        ['energy level position E_as: ', '[eV]'], ['surface acceptor density N_as: ', '10^17[cm^(-2)]'],
         ['temperature T: ', '[K]'], ['external electric field E_out:', '10^4 [V/m]']]
 
 for i in range(len(text)):
@@ -240,7 +240,7 @@ E_d.insert(0, "0.5")
 E_d.grid(row=4, column=2)
 
 N_d0 = tk.Entry(window)
-N_d0.insert(0, "50")
+N_d0.insert(0, "10")
 N_d0.grid(row=5, column=2)
 
 E_as = tk.Entry(window)
@@ -248,7 +248,7 @@ E_as.insert(0, "2.5")
 E_as.grid(row=6, column=2)
 
 N_as = tk.Entry(window)
-N_as.insert(0, "50")
+N_as.insert(0, "10")
 N_as.grid(row=7, column=2)
 
 T = tk.Entry(window)
@@ -256,10 +256,10 @@ T.insert(0, "300")
 T.grid(row=8, column=2)
 
 E_out = tk.Entry(window)
-E_out.insert(0, "20")
+E_out.insert(0, "1")
 E_out.grid(row=9, column=2)
 
-tk.Label(window, text='\n\nmaterial: ', bg='white').grid(row=10, column=1, stick='w')
+tk.Label(window, text='\n\nsemiconductor: ', bg='white').grid(row=10, column=1, stick='w')
 var1 = tk.IntVar()
 var2 = tk.IntVar()
 var3 = tk.IntVar()
@@ -291,6 +291,6 @@ ax.set_ylabel("E [eV]")
 
 canvas = FigureCanvasTkAgg(fig)
 canvas.get_tk_widget().grid(row=0, column=5, columnspan=15, rowspan=15)
-window.grid_columnconfigure(4, minsize=200)
+window.grid_columnconfigure(4, minsize=80)
 
 window.mainloop()
