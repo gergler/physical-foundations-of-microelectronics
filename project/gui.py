@@ -96,12 +96,12 @@ def Si_calculated():
 
 def output_info(results):
     if results['message'] != 'ok':
-        tk.Label(window, text=results['message'], fg='darkorange', bg='white').grid(row=16, column=5, columnspan=15, rowspan=15,
+        tk.Label(window, text=results['message'], fg='darkorange', bg='white', font="Arial 12", justify=tk.LEFT).grid(row=0, column=5, columnspan=15, rowspan=2,
                                                                     stick='we')
     else:
         tk.Label(window,
-                 text=f"fermi level: {results['E_f_s'][0]:.6f} [eV]\nbending of zone PHI: {results['phi']:.6f} [eV]\nspace charge region W: {results['W']:.8f} [cm]",
-                 fg='black', bg='white').grid(row=16, column=5, columnspan=15, rowspan=15, stick='we')
+                 text=f"fermi level:\t\t{results['E_f_s'][0]:.6f} [eV]\nbending of zone PHI:\t\t{results['phi']:.6f} [eV]\nspace charge region W:\t{results['W']:.8f} [cm]",
+                 fg='black', bg='white', font="Arial 12", justify=tk.LEFT).grid(row=0, column=5, columnspan=15, rowspan=2, stick='we')
 
 
 def start():
@@ -135,19 +135,19 @@ def help():
 window = tk.Tk()
 window.config(bg='white')
 window.title('Pinning of Fermi Level')
-window.geometry(f"{width}x{height}+100+100")
+window.geometry('{}x{}'.format(window.winfo_screenwidth(), window.winfo_screenheight()))
 window.resizable(True, True)
 
 text = [['forbidden zone E_g: ', '[eV]'], ['dielectric constant ε: ', ' '], ['effective hole masses m_h: ', 'm_0'],
         ['effective electron masses m_e: ', 'm_0'], ['donor level position E_d: ', '[eV]'],
-        ['donor concentration N_d0: ', '10^16[cm^(-3)]'],
+        ['donor concentration N_d: ', '10^16[cm^(-3)]'],
         ['energy level position E_as: ', '[eV]'], ['surface acceptor density N_as: ', '10^17[cm^(-2)]'],
         ['temperature T: ', '[K]'], ['external electric field E_out:', '10^4 [V/m]']]
 
 for i in range(len(text)):
-    tk.Label(window, text=text[i][0], bg='white', ).grid(row=i, column=1, stick='w')
-    tk.Label(window, text=text[i][1], bg='white').grid(row=i, column=3, stick='w')
-    window.grid_rowconfigure(i, minsize=30)
+    tk.Label(window, text=text[i][0], bg='white', font="Arial 10").grid(row=i, column=1, stick='w')
+    tk.Label(window, text=text[i][1], bg='white', font="Arial 10").grid(row=i, column=3, stick='w')
+    #window.grid_rowconfigure(i, minsize=20)
 
 E_g = tk.Entry(window)
 E_g.insert(0, "5")
@@ -189,30 +189,30 @@ E_out = tk.Entry(window)
 E_out.insert(0, "1")
 E_out.grid(row=9, column=2)
 
-tk.Label(window, text='\n\nsemiconductor: ', bg='white').grid(row=10, column=1, stick='w')
+tk.Label(window, text='semiconductor: ', bg='white').grid(row=10, column=1, stick='w')
 
-tk.Button(window, text='Si', bg='white', command=Si_calculated).grid(row=10, column=2, stick='we')
-tk.Button(window, text='Ge', bg='white', command=Ge_calculated).grid(row=11, column=2, stick='we')
-tk.Button(window, text='GaAs', bg='white', command=GaAs_calculated).grid(row=12, column=2, stick='we')
+tk.Button(window, text='Si', bg='white', command=Si_calculated, font="Arial 10").grid(row=10, column=2, columnspan=2, stick='we')
+tk.Button(window, text='Ge', bg='white', command=Ge_calculated, font="Arial 10").grid(row=11, column=2, columnspan=2, stick='we')
+tk.Button(window, text='GaAs', bg='white', command=GaAs_calculated, font="Arial 10").grid(row=11, column=1, stick='we')
 
 window.grid_columnconfigure(0, minsize=30)
 
 
-tk.Button(window, text='START', bg='peachpuff', command=start).grid(row=len(text) + 3, column=1, columnspan=3,
+tk.Button(window, text='START', bg='peachpuff', command=start, font="Arial 10").grid(row=12, column=1, columnspan=3,
                                                                     stick='we')
-tk.Button(window, text='CLEAR', bg='turquoise', command=clear).grid(row=len(text) + 4, column=1, columnspan=3,
+tk.Button(window, text='CLEAR', bg='turquoise', command=clear, font="Arial 10").grid(row=13, column=1, columnspan=3,
                                                                     stick='we')
-tk.Button(window, text='HELP', bg='palegreen', command=help).grid(row=len(text) + 5, column=1, columnspan=3,
+tk.Button(window, text='HELP', bg='palegreen', command=help, font="Arial 10").grid(row=14, column=1, columnspan=3,
                                                                   stick='we')
 
-fig = Figure(figsize=(8, 8))
+fig = Figure(figsize=(11, 8))
 ax = fig.add_subplot()
 ax.grid()
 ax.set_xlabel("x [cm]")
 ax.set_ylabel("E [eV]")
 
 canvas = FigureCanvasTkAgg(fig)
-canvas.get_tk_widget().grid(row=0, column=5, columnspan=15, rowspan=15)
-window.grid_columnconfigure(4, minsize=80)
+canvas.get_tk_widget().grid(row=0, column=5, columnspan=15, rowspan=16)
+window.grid_columnconfigure(4, minsize=20)
 
 window.mainloop()
