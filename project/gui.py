@@ -32,18 +32,6 @@ def draw_figure(ax, canvas, results):
     canvas.draw()
 
 
-def selection():
-    global mat
-    if var1.get() == 1:
-        mat = 'Si'
-    elif var2.get() == 1:
-        mat = 'Ge'
-    elif var3.get() == 1:
-        mat = 'GaAs'
-    else:
-        mat = 'custom'
-
-
 def get_calculated_values():
     args = {
         "E_gap": float(E_g.get()),  # Band gap [eV]
@@ -56,27 +44,12 @@ def get_calculated_values():
         "N_as": float(N_as.get()) * coef_phys_parameters['N_as'],  # Concentration of surface acceptors [cm^(-3)]
         "T": float(T.get()),  # Temperature [K]
         "E_out": float(E_out.get()) * coef_phys_parameters['E_out'],  # External electric field
-        "material": mat  # Material
     }
 
     return calculations.calculate(args)
 
 
 def GaAs_calculated():
-    GaAs_args = {
-        "E_gap": 1.424,  # Band gap [eV]
-        "epsilon": 12.9,  # Dielectric permittivity
-        "m_h": 0.53,  # Effective hole mass [m_0]
-        "m_e": 0.063,  # Effective electron mass [m_0]
-        "E_d": 1e-2,  # Donors level [eV]
-        "N_d0": 10 * coef_phys_parameters['N_d0'],  # Concentration of donors 10^27 [cm^(-3)]
-        "E_as": 1.424 / 2,  # Surface acceptors level [eV]
-        "N_as": 10 * coef_phys_parameters['N_as'],  # Concentration of surface acceptors 10^27 [cm^(-3)]
-        "T": 300,  # Temperature [K]
-        "E_out": 1 * coef_phys_parameters['E_out'],  # External electric field
-        "material": 'Si'  # Material
-    }
-
     clear()
 
     E_g.insert(0, "1.423")
@@ -90,24 +63,8 @@ def GaAs_calculated():
     T.insert(0, "300")
     E_out.insert(0, "1")
 
-    return calculations.calculate(GaAs_args)
-
 
 def Ge_calculated():
-    Ge_args = {
-        "E_gap": 0.661,  # Band gap [eV]
-        "epsilon": 16.2,  # Dielectric permittivity
-        "m_h": 0.34,  # Effective hole mass [m_0]
-        "m_e": 0.22,  # Effective electron mass [m_0]
-        "E_d": 1e-2,  # Donors level [eV]
-        "N_d0": 10 * coef_phys_parameters['N_d0'],  # Concentration of donors 10^27 [cm^(-3)]
-        "E_as": 0.661 / 2,  # Surface acceptors level [eV]
-        "N_as": 10 * coef_phys_parameters['N_as'],  # Concentration of surface acceptors 10^27 [cm^(-3)]
-        "T": 300,  # Temperature [K]
-        "E_out": 1 * coef_phys_parameters['E_out'],  # External electric field
-        "material": 'Si'  # Material
-    }
-
     clear()
 
     E_g.insert(0, "0.661")
@@ -121,24 +78,8 @@ def Ge_calculated():
     T.insert(0, "300")
     E_out.insert(0, "1")
 
-    return calculations.calculate(Ge_args)
-
 
 def Si_calculated():
-    Si_args = {
-        "E_gap": 1.12,  # Band gap [eV]
-        "epsilon": 11.7,  # Dielectric permittivity
-        "m_h": 0.81,  # Effective hole mass [m_0]
-        "m_e": 0.36,  # Effective electron mass [m_0]
-        "E_d": 1e-2,  # Donors level [eV]
-        "N_d0": 10 * coef_phys_parameters['N_d0'],  # Concentration of donors 10^27 [cm^(-3)]
-        "E_as": 1.12 / 2,  # Surface acceptors level [eV]
-        "N_as": 10 * coef_phys_parameters['N_as'],  # Concentration of surface acceptors 10^27 [cm^(-3)]
-        "T": 300,  # Temperature [K]
-        "E_out": 1 * coef_phys_parameters['E_out'],  # External electric field
-        "material": 'Si'  # Material
-    }
-
     clear()
 
     E_g.insert(0, "1.12")
@@ -152,8 +93,6 @@ def Si_calculated():
     T.insert(0, "300")
     E_out.insert(0, "1")
 
-    return calculations.calculate(Si_args)
-
 
 def output_info(results):
     if results['message'] != 'ok':
@@ -166,14 +105,7 @@ def output_info(results):
 
 
 def start():
-    if mat == 'custom':
-        draw_figure(ax, canvas, get_calculated_values())
-    if mat == 'Si':
-        draw_figure(ax, canvas, Si_calculated())
-    if mat == 'Ge':
-        draw_figure(ax, canvas, Ge_calculated())
-    if mat == 'GaAs':
-        draw_figure(ax, canvas, GaAs_calculated())
+    draw_figure(ax, canvas, get_calculated_values())
 
 
 def clear():
@@ -190,19 +122,17 @@ def clear():
 
 
 def help():
-    help_text = """HOW TO USE THIS PROGRAM:\n*This program illustrates Fermi level pinning by surface acceptors*\n\n\n- To start the program, choose the type of semiconductor: Si, Ge, GaAs or CUSTOM\n\n*****for CUSTOM set parameters at left blanks, for known types of semiconductor, the data will be set automatically*****\n\n- The START button will configure all the parameters and will draw graph\n\n- If you want to clear all parameters, use the CLEAR button"""
+    help_text = """This program illustrates Fermi level pinning by surface acceptors \n\n\n1) Enter the required values in the forms on the left or click on the button: Si, Ge, GaAs, which will automatically set the values \n\n2) Press the START button to draw graphs \n\n3) Press the CLEAR button to clear all forms \n\n4) Press HELP for quick reference"""
     message_win = tk.Tk()
     message_win.config(bg='lightcyan')
     message_win.title('HELP')
     message_win.geometry(f"1150x300+300+200")
-    tk.Label(message_win, text=help_text, fg='black', bg='lightcyan', font="Arial 14", justify=tk.CENTER).pack()
+    tk.Label(message_win, text=help_text, fg='black', bg='lightcyan', font="Arial 14", justify=tk.LEFT).pack()
     message_win.mainloop()
 
 
 ##################################################################################
 window = tk.Tk()
-photo = tk.PhotoImage(file='icon.png')
-window.iconphoto(False, photo)
 window.config(bg='white')
 window.title('Pinning of Fermi Level')
 window.geometry(f"{width}x{height}+100+100")
@@ -260,27 +190,19 @@ E_out.insert(0, "1")
 E_out.grid(row=9, column=2)
 
 tk.Label(window, text='\n\nsemiconductor: ', bg='white').grid(row=10, column=1, stick='w')
-var1 = tk.IntVar()
-var2 = tk.IntVar()
-var3 = tk.IntVar()
-var4 = tk.IntVar()
-tk.Checkbutton(window, text='Si', variable=var1, onvalue=1, offvalue=0, command=selection).grid(row=10, column=2,
-                                                                                                stick='w')
-tk.Checkbutton(window, text='Ge', variable=var2, onvalue=1, offvalue=0, command=selection).grid(row=11, column=2,
-                                                                                                stick='w')
-tk.Checkbutton(window, text='GaAs', variable=var3, onvalue=1, offvalue=0, command=selection).grid(row=10, column=3,
-                                                                                                  stick='w')
-tk.Checkbutton(window, text='custom', variable=var4, onvalue=1, offvalue=0, command=selection).grid(row=11, column=3,
-                                                                                                    stick='w')
-window.grid_columnconfigure(0, minsize=30)
-window.grid_rowconfigure(10, minsize=30)
-window.grid_rowconfigure(11, minsize=30)
 
-tk.Button(window, text='START', bg='peachpuff', command=start).grid(row=len(text) + 2, column=1, columnspan=3,
+tk.Button(window, text='Si', bg='white', command=Si_calculated).grid(row=10, column=2, stick='we')
+tk.Button(window, text='Ge', bg='white', command=Ge_calculated).grid(row=11, column=2, stick='we')
+tk.Button(window, text='GaAs', bg='white', command=GaAs_calculated).grid(row=12, column=2, stick='we')
+
+window.grid_columnconfigure(0, minsize=30)
+
+
+tk.Button(window, text='START', bg='peachpuff', command=start).grid(row=len(text) + 3, column=1, columnspan=3,
                                                                     stick='we')
-tk.Button(window, text='CLEAR', bg='turquoise', command=clear).grid(row=len(text) + 3, column=1, columnspan=3,
+tk.Button(window, text='CLEAR', bg='turquoise', command=clear).grid(row=len(text) + 4, column=1, columnspan=3,
                                                                     stick='we')
-tk.Button(window, text='HELP', bg='palegreen', command=help).grid(row=len(text) + 4, column=1, columnspan=3,
+tk.Button(window, text='HELP', bg='palegreen', command=help).grid(row=len(text) + 5, column=1, columnspan=3,
                                                                   stick='we')
 
 fig = Figure(figsize=(8, 8))
