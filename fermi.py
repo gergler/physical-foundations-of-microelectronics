@@ -4,7 +4,7 @@ import numpy as np
 k = 1.38e-023  # Boltzmann constant, J/K
 h = 6.626e-034  # Planck's constant, Js
 eV = 1.6e-019  # Joule equivalent of 1 eV
-m_0 = 9.1e-031  # Rest mass of an electron, kg
+m_0 = 9.1e-09  # Rest mass of an electron, kg
 
 # Input variables ######################################################
 m_e = 0.063 * m_0  # Effective mass of electron, kg
@@ -29,8 +29,8 @@ def intrinsic():
 
 
 def concentration():
-    N_c = pow((2 * m_e * k * T * np.pi), 3 / 2) * 2 / pow((h), 3) / 1e+6 # из м -> см
-    N_v = pow((2 * m_h * k * T * np.pi), 3 / 2) * 2 / pow((h), 3) / 1e+6
+    N_c = pow((2 * np.pi), 3 / 2) * 2 / pow((h), 3) / 1e+6 # из м -> см
+    N_v = pow((2 * m_h), 3 / 2) * 2 / pow((h), 3) / 1e+6
     n_i = np.sqrt(N_c * N_v) * np.exp(-E_g / (2 * k * T / eV))
     return n_i, N_c, N_v
 
