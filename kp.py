@@ -2,25 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # constants
-h_Plank_SI = 1.054 * 10 ** (-34)  # Дж*с
-m_electron_SI = 9.109 * 10 ** (-31)  # кг
-lattice_parameter_Silicium_SI = 0.5 * (10 ** (-9))  # м
-eV = 1.602 * 10 ** (-19)  # Дж
+eV = 1.602e-19  # Дж
+h = 1.054e-34  # Дж*с
+m_0 = 9.109e-31  # кг
 
-# m = m_electron_SI
-# a = lattice_parameter_Silicium_SI
-# b = 1/10*a
-# U_0_eV = 30
-# U_0 = U_0_eV*one_eV_SI
-
-m = 0.49 * m_electron_SI
-a = 10 * (10 ** (-9))
-b = 5 * (10 ** (-9))
-U_0_eV = 0.58
-U_0 = U_0_eV * eV
+# b - тонкий высокий барьер, а - межбарьерное расстояние
+m = 0.43 * m_0  # kg
+b = 4e-9  # m
+a = 10e-9  # m
+U_0_eV = 0.22  # eV
+U_0 = U_0_eV * eV  # J
 
 N = 100
 E_0 = U_0 - U_0 / N  # first non-zero approximation
+# print(f'E_0 = {E_0 / eV} [eV]')
 accuracy = U_0 / 10000000  # accuracy with to find energy_beg, energy_end
 
 
@@ -54,23 +49,27 @@ def dichotomy(func, args, left_border, right_border, epsilon):
 # b - тонкий высокий барьер, а - межбарьерное расстояние
 
 
-# left part of equation
-def left_equation_part(a, b, alpha, beta):
-    return ((pow(alpha, 2) - beta * beta) / 2 / beta / alpha * np.sinh(alpha * b) * np.sin(beta * a) + np.cosh(
-        alpha * b) * np.cos(beta * a))
+# def left_equation_part(a, b, alpha, beta, k):
+#     return ((pow(alpha, 2) - pow(beta, 2)) / (2 * beta * alpha) * np.sinh(alpha * b) * np.sin(beta * a) +
+#             np.cosh(alpha * b) * np.cos(beta * a)) - np.cos(k * (a + b))
+
+
+def left_equation_part(a, b, alpha, beta, k):
+    return ((pow(alpha, 2) - pow(beta, 2)) / (2 * beta * alpha) * np.sinh(beta * b) * np.sin(alpha * a) +
+            np.cosh(beta * b) * np.cos(alpha * a)) - np.cos(k * (a + b))
 
 
 def energy_equation(E, args):
     U_0, a, b, m, wave_number_k = args
-    constant = pow(2 * m / pow(h_Plank_SI, 2), 1 / 2)
-    alpha = constant * pow((U_0 - E), 1 / 2)
+    constant = pow(2 * m / pow(h, 2), 1 / 2)
+    alpha = constant * pow((E - U_0), 1 / 2)
     beta = constant * pow(E, 1 / 2)
-    return left_equation_part(a, b, alpha, beta) - np.cos(wave_number_k * (a + b))
+    return left_equation_part(a, b, alpha, beta, wave_number_k) - np.cos(wave_number_k * (a + b))
 
 
-def energy(a, b, U_0, m, E_0, accuracy):
-    constant = pow(2 * m / pow(h_Plank_SI, 2), 1 / 2)
-    E_start, E_end = E_0, E_0
+def energy(a, b, U_0, m, E_0, accuracy, k):
+    constant = pow(2 * m / pow(h, 2), 1 / 2)
+    E_start, E_end = E_0, U_0
     step = U_0 / 100000
     cur_E = E_start
     process_started = False
@@ -78,13 +77,13 @@ def energy(a, b, U_0, m, E_0, accuracy):
         alpha = constant * pow((U_0 - cur_E), 1 / 2)
         beta = constant * pow(cur_E, 1 / 2)
         if (not process_started):
-            if (left_equation_part(a, b, alpha, beta) < 1.0):
+            if (left_equation_part(a, b, alpha, beta, k) < 1.0):
                 cur_E -= step
             else:
                 process_started = True
-        elif (left_equation_part(a, b, alpha, beta) > 1.0):
+        elif (left_equation_part(a, b, alpha, beta, k) > 1.0):
             cur_E += step
-        elif (left_equation_part(a, b, alpha, beta) < 1.0):
+        elif (left_equation_part(a, b, alpha, beta, k) < 1.0):
             if (step < accuracy):
                 E_start = cur_E
                 break
@@ -97,12 +96,12 @@ def energy(a, b, U_0, m, E_0, accuracy):
     while (True):
         alpha = constant * pow((U_0 - cur_E), 1 / 2)
         beta = constant * pow(cur_E, 1 / 2)
-        if (left_equation_part(a, b, alpha, beta) > -1.0):
+        if (left_equation_part(a, b, alpha, beta, k) > -1.0):
             if (minus_one_achieved and step < accuracy):
                 E_end = cur_E
                 break
             cur_E += step
-        elif (left_equation_part(a, b, alpha, beta) < -1.0):
+        elif (left_equation_part(a, b, alpha, beta, k) < -1.0):
             minus_one_achieved = True
             step /= 2.
             cur_E -= step
@@ -113,43 +112,66 @@ def energy(a, b, U_0, m, E_0, accuracy):
 
 
 def main():
-    energy_beg, energy_end = energy(a, b, U_0, m, E_0, accuracy)
-    print("For first Brullien zone")
-    print("E_min [J] = ", energy_beg)
-    print("E_max [J] = ", energy_end)
+    k = 0.5 * np.pi / (a + b)
+    energy_beg, energy_end = energy(a, b, U_0, m, E_0, accuracy, k)
+    print(f"E_min [eV] = {energy_beg / eV}")
+    print(f"E_max [eV] = {energy_end / eV}")
 
-    necessary_k = 0.5 * np.pi / (a + b)
-    found_energy = dichotomy(energy_equation, (U_0, a, b, m, necessary_k), energy_beg, energy_end, accuracy)
-    print("Found E [J] = ", found_energy)
-    print("Found E [eV] = ", found_energy / eV)
+    # E_beg_arr, E_end_arr = [], []
+    # k_N = 100
+    # k_step = 2 * np.pi / (a + b) / k_N
+    # k_arr = np.arange(-1 * np.pi / (a + b), np.pi / (a + b) + k_step, k_step)
+    # for k in k_arr:
+    #     energy_beg, energy_end = energy(a, b, U_0, m, E_0, accuracy, k)
+    #     E_beg_arr.append(energy_beg/eV)
+    #     E_end_arr.append(energy_end/eV)
+    #
+    # print(f"E_min [eV] = {min(E_beg_arr)}")
+    # print(f"E_max [eV] = {max(E_end_arr)}")
 
-    k_N = 100
-    k_step = 2 * np.pi / (a + b) / k_N
-    k_arr = np.arange(-1 * np.pi / (a + b), np.pi / (a + b) + k_step, k_step)
-    energy_arr = [dichotomy(energy_equation, (U_0, a, b, m, k), energy_beg, energy_end, accuracy) for k in k_arr]
+    # fig, axes = plt.subplots(nrows=1, ncols=1)
+    #
+    # axes.plot(k_arr, E_beg_arr, lw=2, color='b', alpha=1,  label='minimum')
+    # axes.plot(k_arr, E_end_arr, lw=2, color='r', alpha=1, label='maximum')
+    # axes.set_xlabel("k*(a+b)")
+    # axes.set_ylabel("Energy")
+    # axes.set_title("Energy of the first Brullien zone")
+    #
+    # fig.set_figwidth(6)
+    # fig.set_figheight(6)
+    # plt.show()
+    #
+    # necessary_k = 0.5 * np.pi / (a + b)
+    # found_energy = dichotomy(energy_equation, (U_0, a, b, m, necessary_k), energy_beg, energy_end, accuracy)
+    # print(f"Found E [eV] = {found_energy / eV}")
 
-    for i in range(len(energy_arr)):
-        if (energy_arr[i] == None):
-            if (i == 0):
-                energy_arr[i] = energy_arr[i + 1]
-            elif (i == k_N):
-                energy_arr[i] = energy_arr[i - 1]
-            else:
-                energy_arr[i] = (energy_arr[i - 1] + energy_arr[i + 1]) / 2
-
-    energy_arr = [E / eV for E in energy_arr]
-    kl_arr = [cur_k * (a + b) for cur_k in k_arr]
-
-    fig, axes = plt.subplots(nrows=1, ncols=1)
-
-    axes.plot(kl_arr, energy_arr, lw=2, color='b', alpha=1)
-    axes.set_xlabel("k*(a+b)")
-    axes.set_ylabel("Energy")
-    axes.set_title("Energy of the first Brullien zone")
-
-    fig.set_figwidth(6)
-    fig.set_figheight(6)
-    plt.show()
+    # k_N = 100
+    # k_step = 2 * np.pi / (a + b) / k_N
+    # k_arr = np.arange(-1 * np.pi / (a + b), np.pi / (a + b) + k_step, k_step)
+    # energy_arr = [dichotomy(energy_equation, (U_0, a, b, m, k), energy_beg, energy_end, accuracy) for k in k_arr]
+    #
+    # for i in range(len(energy_arr)):
+    #     if (energy_arr[i] == None):
+    #         if (i == 0):
+    #             energy_arr[i] = energy_arr[i + 1]
+    #         elif (i == k_N):
+    #             energy_arr[i] = energy_arr[i - 1]
+    #         else:
+    #             energy_arr[i] = (energy_arr[i - 1] + energy_arr[i + 1]) / 2
+    #
+    # energy_arr = [E / eV for E in energy_arr]
+    # kl_arr = [cur_k * (a + b) for cur_k in k_arr]
+    #
+    # fig, axes = plt.subplots(nrows=1, ncols=1)
+    #
+    # axes.plot(kl_arr, energy_arr, lw=2, color='b', alpha=1)
+    # axes.set_xlabel("k*(a+b)")
+    # axes.set_ylabel("Energy")
+    # axes.set_title("Energy of the first Brullien zone")
+    #
+    # fig.set_figwidth(6)
+    # fig.set_figheight(6)
+    # plt.show()
 
 
 if __name__ == '__main__':
