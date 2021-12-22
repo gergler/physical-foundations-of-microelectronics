@@ -6,9 +6,6 @@ import calculations
 
 matplotlib.use("TkAgg")
 
-height = 900
-width = 1400
-
 coef_phys_parameters = {'N_d0': 1e16, 'N_as': 1e17, 'E_out': 1e4}
 
 
